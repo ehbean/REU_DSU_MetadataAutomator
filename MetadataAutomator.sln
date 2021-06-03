@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30523.141
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "MetadataAutomator", "MetadataAutomator.pyproj", "{EA311DB7-6464-44E2-8A3D-C6ADD5293874}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EA311DB7-6464-44E2-8A3D-C6ADD5293874}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA311DB7-6464-44E2-8A3D-C6ADD5293874}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {ADE9532B-8984-4598-B44F-84EAF80DAE40}
+	EndGlobalSection
+EndGlobal
