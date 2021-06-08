@@ -29,8 +29,9 @@ def FilterVideos():
     return videoList
 
 # Reads all avaiable exif data from target image, that Pillow is able to extract.
-def FindExif():
-    image = Image.open(imagePath)
+# If infomation is missing, or not stored as metadata, it returns as "-"
+def FindExif(targetImage):
+    image = Image.open(targetImage)
     exifData = image.getexif()
     exifDict = {}
     
@@ -40,21 +41,62 @@ def FindExif():
                 exifDict[TAGS[tag]] = value
     except:
         exifDict[TAGS[tag]] = "-"
-        pass
 
-    exifImgDes = exifDict["ImageDescription"]
-    exifMake = exifDict["Make"]
-    exifModel = exifDict["Model"]
-    exifDateTime = exifDict["DateTime"]
-    exifSoftware = exifDict["Software"]
-    return exifImgDes, exifMake, exifMake, exifDateTime, exifSoftware
+    if "ImageDescription" in exifDict:
+        exifImgDes = exifDict["ImageDescription"]
+    else:
+        exifImgDes = "-"
+    if "Make" in exifDict:
+        exifMake = exifDict["Make"]
+    else:
+        exifMake = "-"
+    if "Model" in exifDict:
+        exifModel = exifDict["Model"]
+    else:
+        exifModel = "-"
+    if "DateTime" in exifDict:
+        exifDateTime = exifDict["DateTime"]
+    else:
+        exifDateTime = "-"
+    if "Software" in exifDict:
+        exifSoftware = exifDict["Software"]
+    else:
+        exifSoftware = "-"
+
     #print(exifImgDes + "\n" + exifMake + "\n" + exifModel + "\n" + exifDateTime + "\n" + exifSoftware)
+    return exifImgDes, exifMake, exifMake, exifDateTime, exifSoftware
+
 
 # Uses GPSPhoto module to target image's Longitutde, Latitude, and Altitude.
-def FindGPS():
-    gpsData = gpsphoto.getGPSData(imagePath)
-    gpsLat = gpsData["Latitude"]
-    gpsLong = gpsData["Longitude"]
-    gpsAlt = gpsData["Altitude"]
-    #print(gpsLat, gpsLong, gpsAlt)
-    return gpsLat, gpsLong, gpsAlt
+# If infomation is missing, or not stored as metadata, it returns as "-"
+def FindGPS(targetImage):
+    gpsData = gpsphoto.getGPSData(targetImage)
+    try:
+        if "Latitude" in gpsData:
+            gpsLat = gpsData["Latitude"]
+        else:
+            gpsLat = "-"
+        if "Longitude" in gpsData:
+            gpsLong = gpsData["Longitude"]
+        else:
+            gpsLong = "-"
+        if "Altitude" in gpsData:
+            gpsAlt = gpsData["Altitude"]
+        else:
+            gpsAlt = "-"
+        #print(gpsLat, gpsLong, gpsAlt)
+        return gpsLat, gpsLong, gpsAlt
+    except:
+        print("No GPS Exif Found")
+
+def GatherImageExif():
+    FilterImages()
+
+    for i in range(len(imageList)):
+        targetImage = str(filePath) + imageList[i]
+        print(targetImage)
+        FindGPS(targetImage)
+        FindExif(targetImage)
+
+
+GatherImageExif()
