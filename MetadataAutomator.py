@@ -1,4 +1,4 @@
-import os #https://docs.python.org/3/library/os.html
+import os
 import csv
 from PIL import Image
 from PIL.ExifTags import TAGS, GPSTAGS
@@ -14,7 +14,7 @@ videoList = []
 
 # Reads all the files inside a directory for .jpg files, stores them in a list, and returns the list.
 def FilterImages():
-    imageList.clear()
+    #imageList.clear()
     for x in os.listdir(filePath):
         if (x.endswith(".jpg") or x.endswith(".JPG")):
             imageList.append(x)
@@ -30,17 +30,25 @@ def FilterVideos():
 
 # Reads all avaiable exif data from target image, that Pillow is able to extract.
 def FindExif():
-    imagePath = r"C:/Users/ehbea/source/repos/REU/MetadataAutomator/Media/DJI_0002.JPG"
     image = Image.open(imagePath)
     exifData = image.getexif()
+    exifDict = {}
+    
+    try:
+        for tag, value in image.getexif().items():
+            if tag in TAGS:
+                exifDict[TAGS[tag]] = value
+    except:
+        exifDict[TAGS[tag]] = "-"
+        pass
 
-    for tag_id in exifData:
-        tag = TAGS.get(tag_id, tag_id)
-        data = exifData.get(tag_id)
-
-        if isinstance(data, bytes):
-            data = data.decode()
-        print(f"{tag:16}: {data}")
+    exifImgDes = exifDict["ImageDescription"]
+    exifMake = exifDict["Make"]
+    exifModel = exifDict["Model"]
+    exifDateTime = exifDict["DateTime"]
+    exifSoftware = exifDict["Software"]
+    return exifImgDes, exifMake, exifMake, exifDateTime, exifSoftware
+    #print(exifImgDes + "\n" + exifMake + "\n" + exifModel + "\n" + exifDateTime + "\n" + exifSoftware)
 
 # Uses GPSPhoto module to target image's Longitutde, Latitude, and Altitude.
 def FindGPS():
@@ -50,8 +58,3 @@ def FindGPS():
     gpsAlt = gpsData["Altitude"]
     #print(gpsLat, gpsLong, gpsAlt)
     return gpsLat, gpsLong, gpsAlt
-
-FindExif()
-FindGPS()
-#Test()
-
