@@ -8,8 +8,6 @@ import piexif
 from GPSPhoto import gpsphoto
 
 filePath = r"C:/Users/ehbea/source/repos/REU/MetadataAutomator/Media/"
-imagePath = r"C:/Users/ehbea/source/repos/REU/MetadataAutomator/Media/DJI_0002.JPG"
-testImage = r"C:/Users/ehbea/source/repos/REU/MetadataAutomator/Media/WIN_20210604_08_51_43_Pro.JPG"
 reportHome = r"C:/Users/ehbea/source/repos/REU/MetadataAutomator/"
 metaFolder = r"C:/Users/ehbea/source/repos/REU/MetadataAutomator/Reports/"
 imageList = []
