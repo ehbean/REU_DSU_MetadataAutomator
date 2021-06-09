@@ -1,5 +1,6 @@
 import os
 import csv
+from datetime import datetime
 from PIL import Image
 from PIL.ExifTags import TAGS, GPSTAGS
 import exifread
@@ -9,6 +10,8 @@ from GPSPhoto import gpsphoto
 filePath = r"C:/Users/ehbea/source/repos/REU/MetadataAutomator/Media/"
 imagePath = r"C:/Users/ehbea/source/repos/REU/MetadataAutomator/Media/DJI_0002.JPG"
 testImage = r"C:/Users/ehbea/source/repos/REU/MetadataAutomator/Media/WIN_20210604_08_51_43_Pro.JPG"
+reportHome = r"C:/Users/ehbea/source/repos/REU/MetadataAutomator/"
+metaFolder = r"C:/Users/ehbea/source/repos/REU/MetadataAutomator/Reports/"
 imageList = []
 videoList = []
 
@@ -33,6 +36,7 @@ def FilterVideos():
 def FindExif(targetImage):
     image = Image.open(targetImage)
     exifData = image.getexif()
+    global exifDict
     exifDict = {}
     
     try:
@@ -43,60 +47,101 @@ def FindExif(targetImage):
         exifDict[TAGS[tag]] = "-"
 
     if "ImageDescription" in exifDict:
+        global exifImgDes
         exifImgDes = exifDict["ImageDescription"]
     else:
         exifImgDes = "-"
     if "Make" in exifDict:
+        global exifMake
         exifMake = exifDict["Make"]
     else:
         exifMake = "-"
     if "Model" in exifDict:
+        global exifModel
         exifModel = exifDict["Model"]
     else:
         exifModel = "-"
     if "DateTime" in exifDict:
+        global exifDateTime
         exifDateTime = exifDict["DateTime"]
     else:
         exifDateTime = "-"
     if "Software" in exifDict:
+        global exifSoftware
         exifSoftware = exifDict["Software"]
     else:
         exifSoftware = "-"
 
-    #print(exifImgDes + "\n" + exifMake + "\n" + exifModel + "\n" + exifDateTime + "\n" + exifSoftware)
-    return exifImgDes, exifMake, exifMake, exifDateTime, exifSoftware
-
+    return exifDict
 
 # Uses GPSPhoto module to target image's Longitutde, Latitude, and Altitude.
 # If infomation is missing, or not stored as metadata, it returns as "-"
 def FindGPS(targetImage):
+    global gpsData
     gpsData = gpsphoto.getGPSData(targetImage)
     try:
         if "Latitude" in gpsData:
+            global gpsLat
             gpsLat = gpsData["Latitude"]
         else:
             gpsLat = "-"
         if "Longitude" in gpsData:
+            global gpsLong
             gpsLong = gpsData["Longitude"]
         else:
             gpsLong = "-"
         if "Altitude" in gpsData:
+            global gpsAlt
             gpsAlt = gpsData["Altitude"]
         else:
             gpsAlt = "-"
         #print(gpsLat, gpsLong, gpsAlt)
-        return gpsLat, gpsLong, gpsAlt
+        #print(gpsData)
+
     except:
         print("No GPS Exif Found")
+    return gpsData
+
+def Merge():
+    global totalDict
+    totalDict = {}
+    totalDict.update(gpsData)
+    totalDict.update(exifDict)
+    print(totalDict)
+    return totalDict
+
+def GenDir():
+    foldersFound = os.listdir(reportHome)
+
+    if "Reports" not in foldersFound:
+        os.mkdir(metaFolder)
+    else:
+        pass
+
+def WriteReport(targetImage):
+    now = datetime.now()
+    formatNow = now.strftime("%d-%m-%Y_%H-%M")
+    reportName = "ExifReport" + formatNow + ".csv"
+    reportPath = metaFolder+reportName
+
+    headers = ["TargetFile", "ImageDescription", "Make", "Model", "DateTime", "Software", "Latitude", "Longitude", "Altitude", 'XResolution', 'YResolution', 'XPKeywords', 'YCbCrPositioning', 'GPSInfo', 'XPComment', 'ResolutionUnit', 'Orientation', 'ExifOffset', 'ImageLength', 'ImageWidth']
+
+    with open(reportPath, "a", newline='') as file:
+        writer = csv.DictWriter(file, fieldnames=headers)
+
+        writer.writeheader()
+        writer.writerow(totalDict)
 
 def GatherImageExif():
     FilterImages()
+    GenDir()
 
     for i in range(len(imageList)):
         targetImage = str(filePath) + imageList[i]
         print(targetImage)
         FindGPS(targetImage)
         FindExif(targetImage)
-
+        Merge()
+        WriteReport(targetImage)
 
 GatherImageExif()
