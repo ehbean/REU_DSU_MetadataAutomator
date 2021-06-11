@@ -116,7 +116,7 @@ def GenDir():
     else:
         pass
 
-def WriteReport(targetImage):
+def WriteReport(targetImage, runCheck):
     now = datetime.now()
     formatNow = now.strftime("%d-%m-%Y_%H-%M")
     reportName = "ExifReport" + formatNow + ".csv"
@@ -127,12 +127,18 @@ def WriteReport(targetImage):
     with open(reportPath, "a", newline='') as file:
         writer = csv.DictWriter(file, fieldnames=headers)
 
-        writer.writeheader()
+        if runCheck == 0:
+           runCheck = runCheck + 1
+           writer.writeheader()
+        else:
+            pass
         writer.writerow(totalDict)
 
 def GatherImageExif():
     FilterImages()
     GenDir()
+    global runCheck
+    runCheck = 0
 
     for i in range(len(imageList)):
         targetImage = str(filePath) + imageList[i]
@@ -140,6 +146,8 @@ def GatherImageExif():
         FindGPS(targetImage)
         FindExif(targetImage)
         Merge()
-        WriteReport(targetImage)
+        WriteReport(targetImage, runCheck)
+        runCheck = runCheck + 1
+
 
 GatherImageExif()
